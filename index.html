@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <title>CUDA Calculator</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <a href="" class="brand">CUDA Calculator</a>
+                    </div>
+                </div>
+            </div>
+        
+            <form>
+                <div class="control-group">
+                    <label class="control-label" for="version">Version</label>
+                    <div class="controls">
+                        <label class="radio"><input type="radio" name="version" value="1.0">1.0</label>
+                        <label class="radio"><input type="radio" name="version" value="1.1">1.1</label>
+                        <label class="radio"><input type="radio" name="version" value="1.2">1.2</label>
+                        <label class="radio"><input type="radio" name="version" value="1.3">1.3</label>
+                        <label class="radio"><input type="radio" name="version" value="2.0">2.0</label>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="">Threads per block</label>
+                    <input type="text" name="threadsPerBlock" value="256">
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="">Registers per thread</label>
+                    <input type="text" name="registersPerThread" value="8">
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="">Shared memory per block</label>
+                    <input type="text" name="sharedMemoryPerBlock" value="1024">
+                </div>
+                <button type="submit" class="btn">Calculate</button>
+
+            </form>
+            <div id="output" hidden>
+                <h3>GPU Occupancy Data is displayed here and in the graphs</h3>
+                <table>
+                    <tr>
+                        <th>Active Threads per Multiprocessor</th>
+                        <td data-value="activeThreadsPerMultiprocessor"></td>
+                    </tr>
+                    <tr>
+                        <th>Active Warps per Multiprocessor</th>
+                        <td data-value="activeWarpsPerMultiprocessor"></td>
+                    </tr>
+                    <tr>
+                        <th>Active Thread Blocks per Multiprocessor</th>
+                        <td data-value="activeThreadBlocksPerMultiprocessor"></td>
+                    </tr>
+                    <tr>
+                        <th>Occupancy of each Multiprocessor</th>
+                        <td data-value="occupancyOfMultiprocessor"></td>
+                    </tr>
+                </table>
+
+                <h3>Physical Limits for GPU Compute Capability</h3>
+                <table>
+                    <tr>
+                        <th>Version</th>
+                        <td data-value="version"></td>
+                    </tr>
+                    <tr>
+                        <th>Threads per Warp</th>
+                        <td data-value="threadsPerWarp"></td>
+                    </tr>
+                    <tr>
+                        <th>Warps per Multiprocessor</th>
+                        <td data-value="warpsPerMultiprocessor"></td>
+                    </tr>
+                    <tr>
+                        <th>Threads per Multiprocessor</th>
+                        <td data-value="threadsPerMultiprocessor"></td>
+                    </tr>
+                    <tr>
+                        <th>Thread Blocks per Multiprocessor</th>
+                        <td data-value="threadBlocksPerMultiprocessor"></td>
+                    </tr>
+                    <tr>
+                        <th>Total # of 32-bit registers per Multiprocessor</th>
+                        <td data-value="registerFileSize"></td>
+                    </tr>
+                    <tr>
+                        <th>Register allocation unit size</th>
+                        <td data-value="registerAllocationUnitSize"></td>
+                    </tr>
+                    <tr>
+                        <th>Register allocation granularity</th>
+                        <td data-value="allocationGranularity"></td>
+                    </tr>
+                    <tr>
+                        <th>Shared Memory per Multiprocessor (bytes)</th>
+                        <td data-value="sharedMemoryPerMultiprocessor"></td>
+                    </tr>
+                    <tr>
+                        <th>Shared Memory Allocation unit size</th>
+                        <td data-value="sharedMemoryAllocationUnitSize"></td>
+                    </tr>
+                    <tr>
+                        <th>Warp allocation granularity (for register allocation)</th>
+                        <td data-value="warpAllocationGranularity"></td>
+                    </tr>
+                </table>
+                <h3>Allocation Per Thread Block</h3>
+                <table>
+                    <tr>
+                        <th>Warps</th>
+                        <td data-value="blockWarps"></td>
+                    </tr>
+                    <tr>
+                        <th>Registers</th>
+                        <td data-value="blockRegisters"></td>
+                    </tr>
+                    <tr>
+                        <th>Shared Memory</th>
+                        <td data-value="blockSharedMemory"></td>
+                    </tr>
+                </table>
+
+                <h3>Maximum Thread Blocks Per Multiprocessor</h3>
+                <table>
+                    <tr>
+                        <th>Limited by Max Warps / Blocks per Multiprocessor</th>
+                        <td data-value="threadBlocksPerMultiprocessorLimitedByWarpsOrBlocksPerMultiprocessor"></td>
+                    </tr>
+                    <tr>
+                        <th>Limited by Registers per Multiprocessor</th>
+                        <td data-value="threadBlocksPerMultiprocessorLimitedByRegistersPerMultiprocessor"></td>
+                    </tr>
+                    <tr>
+                        <th>Limited by Shared Memory per Multiprocessor</th>
+                        <td data-value="threadBlocksPerMultiprocessorLimitedBySharedMemoryPerMultiprocessor"></td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+        <script src="http://code.jquery.com/jquery-latest.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="http://documentcloud.github.com/underscore/underscore.js"></script>
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+
+        <script src="calculator.js"></script>
+        <script src="graph.js"></script>
+        <script>
+            $('form').on('submit', function(e){
+                e.preventDefault();
+
+                var d = {};
+                jQuery.map($(this).serializeArray(), function(n, i){
+                    d[n['name']] = n['value'];
+                });
+
+                var data = calculate(d);
+                var graph = calculateGraphs(d);
+                
+
+                var $o = $('#output').show();
+
+                _.forEach(data, function(v,k){
+                    $o.find('[data-value=' + k + ']').text(v);
+                });
+
+
+
+                var gd1 = _.map(graph.graphWarpOccupancyOfThreadsPerBlock, function(v){
+                    var vs = _.values(v)
+                    return {
+                        key: vs[0],
+                        value: vs[1]
+                    }
+                });
+
+                var gd2 = _.map(graph.graphWarpOccupancyOfRegistersPerThread, function(v){
+                    var vs = _.values(v)
+                    return {
+                        key: vs[0],
+                        value: vs[1]
+                    }
+                });
+
+
+                var gd3 = _.map(graph.graphWarpOccupancyOfSharedMemoryPerBlock, function(v){
+                    var vs = _.values(v)
+                    return {
+                        key: vs[0],
+                        value: vs[1]
+                    }
+                });
+
+                drawGraph(gd1);
+                drawGraph(gd2);
+                drawGraph(gd3);
+                
+            })
+        </script>
+    </body>
+</html>
