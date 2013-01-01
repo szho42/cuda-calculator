@@ -1,5 +1,5 @@
-mainConfig = 
-    '1.0': 
+mainConfig =
+    '1.0':
         version: '1.0'
         threadsPerWarp: 32
         warpsPerMultiprocessor: 24
@@ -13,7 +13,7 @@ mainConfig =
         allocationGranularity: 'block'
         sharedMemoryAllocationUnitSize: 512
         warpAllocationGranularity: 2
-    '1.1': 
+    '1.1':
         version: '1.1'
         threadsPerWarp: 32
         warpsPerMultiprocessor: 24
@@ -28,7 +28,7 @@ mainConfig =
         sharedMemoryAllocationUnitSize: 512
         warpAllocationGranularity: 2
 
-    '1.2': 
+    '1.2':
         version: '1.2'
         threadsPerWarp: 32
         warpsPerMultiprocessor: 32
@@ -42,7 +42,7 @@ mainConfig =
         allocationGranularity: 'block'
         sharedMemoryAllocationUnitSize: 512
         warpAllocationGranularity: 2
-    '1.3': 
+    '1.3':
         version: '1.3'
         threadsPerWarp: 32
         warpsPerMultiprocessor: 32
@@ -57,7 +57,7 @@ mainConfig =
         sharedMemoryAllocationUnitSize: 512
         warpAllocationGranularity: 2
 
-    '2.0': 
+    '2.0':
         version: '2.0'
         threadsPerWarp: 32
         warpsPerMultiprocessor: 48
@@ -101,15 +101,11 @@ window.calculate = (input) ->
         else
             ceil(input.registersPerThread * config.threadsPerWarp, config.registerAllocationUnitSize) * blockWarps()
 
-        # =IF(myAllocationGranularity=block, 
-        #     CEILING(CEILING(MyWarpsPerBlock,myWarpAllocationGranularity)*MyRegCount*limitThreadsPerWarp,myAllocationSize), 
-        #     CEILING(MyRegCount*limitThreadsPerWarp, myAllocationSize)*MyWarpsPerBlock)
 
     blockSharedMemory = () ->
         ceil(input.sharedMemoryPerBlock, config.sharedMemoryAllocationUnitSize)
 
     threadBlocksPerMultiprocessorLimitedByWarpsOrBlocksPerMultiprocessor = () ->
-        # debugger
         Math.min(config.threadBlocksPerMultiprocessor, Math.floor(config.warpsPerMultiprocessor / blockWarps()))
 
     threadBlocksPerMultiprocessorLimitedByRegistersPerMultiprocessor = () ->
@@ -132,8 +128,8 @@ window.calculate = (input) ->
 
     activeThreadBlocksPerMultiprocessor = () ->
         Math.min(
-            threadBlocksPerMultiprocessorLimitedByWarpsOrBlocksPerMultiprocessor(), 
-            threadBlocksPerMultiprocessorLimitedByRegistersPerMultiprocessor(), 
+            threadBlocksPerMultiprocessorLimitedByWarpsOrBlocksPerMultiprocessor(),
+            threadBlocksPerMultiprocessorLimitedByRegistersPerMultiprocessor(),
             threadBlocksPerMultiprocessorLimitedBySharedMemoryPerMultiprocessor()
         )
 
@@ -163,6 +159,11 @@ window.calculate = (input) ->
 
 window.calculateGraphs = (input) ->
     graphWarpOccupancyOfThreadsPerBlock = () ->
+
+        current =
+            threadsPerBlock: input.threadsPerBlock
+            activeWarpsPerMultiprocessor: window.calculate(input).activeWarpsPerMultiprocessor
+
         inp = _.clone input
         r = []
         for threadsPerBlock in [16..512] by 16
@@ -173,9 +174,17 @@ window.calculateGraphs = (input) ->
                 activeWarpsPerMultiprocessor: window.calculate(inp).activeWarpsPerMultiprocessor
             })
 
-        return r
+        return {
+            data: r
+            current: current
+        }
 
     graphWarpOccupancyOfRegistersPerThread = () ->
+
+        current =
+            sharedMemoryPerBlock: input.sharedMemoryPerBlock
+            activeWarpsPerMultiprocessor: window.calculate(input).activeWarpsPerMultiprocessor
+
         inp = _.clone input
         r = []
         for registersPerThread in [1..128]
@@ -186,10 +195,19 @@ window.calculateGraphs = (input) ->
                 activeWarpsPerMultiprocessor: window.calculate(inp).activeWarpsPerMultiprocessor
             })
 
-        return r
+        return {
+            data: r
+            current: current
+        }
 
 
     graphWarpOccupancyOfSharedMemoryPerBlock = () ->
+
+        current =
+            sharedMemoryPerBlock: input.sharedMemoryPerBlock
+            activeWarpsPerMultiprocessor: window.calculate(input).activeWarpsPerMultiprocessor
+
+
         inp = _.clone input
         r = []
         for sharedMemoryPerBlock in [512..512*100] by 512
@@ -200,9 +218,12 @@ window.calculateGraphs = (input) ->
                 activeWarpsPerMultiprocessor: window.calculate(inp).activeWarpsPerMultiprocessor
             })
 
-        return r
+        return {
+            data: r
+            current: current
+        }
 
-    output = 
+    output =
         graphWarpOccupancyOfThreadsPerBlock: graphWarpOccupancyOfThreadsPerBlock()
         graphWarpOccupancyOfRegistersPerThread: graphWarpOccupancyOfRegistersPerThread()
         graphWarpOccupancyOfSharedMemoryPerBlock: graphWarpOccupancyOfSharedMemoryPerBlock()
