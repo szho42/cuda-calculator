@@ -182,7 +182,7 @@ window.calculateGraphs = (input) ->
     graphWarpOccupancyOfRegistersPerThread = () ->
 
         current =
-            sharedMemoryPerBlock: input.sharedMemoryPerBlock
+            registersPerThread: input.registersPerThread
             activeWarpsPerMultiprocessor: window.calculate(input).activeWarpsPerMultiprocessor
 
         inp = _.clone input

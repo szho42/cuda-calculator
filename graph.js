@@ -60,7 +60,7 @@ drawGraph = function(input, to){
   .attr("class", "bar")
   .attr("cx", function(d) { return x(d.key); })
   // .attr("dx", x.rangeBand())
-  .attr('r', 5)
+  .attr('r', 2)
   // .attr('dy', 10)
   .attr("cy", function(d) { return y(d.value); })
   // .attr("dy", function(d) { return height - y(d.value); });
@@ -71,7 +71,7 @@ drawGraph = function(input, to){
   .append("circle")
   .attr("class", "current")
   .attr("cx", function(d) { return x(d.key); })
-  .attr('r', 5)
+  .attr('r', 2)
   .attr("cy", function(d) { return y(d.value); })
 
 

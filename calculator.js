@@ -171,7 +171,7 @@
     graphWarpOccupancyOfRegistersPerThread = function() {
       var current, inp, r, registersPerThread, _i;
       current = {
-        sharedMemoryPerBlock: input.sharedMemoryPerBlock,
+        registersPerThread: input.registersPerThread,
         activeWarpsPerMultiprocessor: window.calculate(input).activeWarpsPerMultiprocessor
       };
       inp = _.clone(input);

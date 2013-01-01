@@ -1,5 +1,5 @@
-//$('form').on('submit', function(e){
-//    e.preventDefault();
+$('form').on('submit', function(e){
+    e.preventDefault();
 
     var d = {};
     jQuery.map($('form').serializeArray(), function(n, i){
@@ -16,43 +16,32 @@
         $o.find('[data-value=' + k + ']').text(v);
     });
 
-    var vs = _.values(graph.graphWarpOccupancyOfThreadsPerBlock.current)
-    var gd1 = {
-        current: {
-            key: vs[0],
-            value: vs[1]
-        }
-    };
 
-    gd1.data = _.map(graph.graphWarpOccupancyOfThreadsPerBlock.data, function(v){
-        var vs = _.values(v);
-        return {
-            key: vs[0],
-            value: vs[1]
-        }
+    var gds = _.map(graph, function(v){
+        var vs = _.values(v.current)
+        var gd = {
+            current: {
+                key: vs[0],
+                value: vs[1]
+            }
+        };
+
+        gd.data = _.map(v.data, function(v){
+            var vs = _.values(v);
+            return {
+                key: vs[0],
+                value: vs[1]
+            }
+        });
+
+        return gd;
+
     });
 
-    var gd2 = _.map(graph.graphWarpOccupancyOfRegistersPerThread, function(v){
-        var vs = _.values(v)
-        return {
-            key: vs[0],
-            value: vs[1]
-        }
-    });
+    // $o.find('svg').remove();
+    // var f = $o.find('figure')
+    // drawGraph(gds[0], f[0]);
+    // drawGraph(gds[1], f[1]);
+    // drawGraph(gds[2], f[2]);
 
-
-    var gd3 = _.map(graph.graphWarpOccupancyOfSharedMemoryPerBlock, function(v){
-        var vs = _.values(v)
-        return {
-            key: vs[0],
-            value: vs[1]
-        }
-    });
-
-    $o.find('svg').remove();
-    var f = $o.find('figure')
-    drawGraph(gd1, f[0]);
-    // drawGraph(gd2, f[1]);
-    // drawGraph(gd3, f[2]);
-
-//})
+})
